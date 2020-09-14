@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block headtitle %}
+ I am Mayur
+{% endblock headtitle %}
+
+{% block content %}
+Welocme to tweetme 2
+
+<script>
+const xhr = new XMLHttpRequest()
+const method = "GET"
+const url = "/tweets"
+const responseType = "json"
+
+xhr.responseType = responseType
+xhr.open(method, url)
+xhr.onload = function() {
+ console.log(xhr.response)
+
+}
+xhr.send()
+</script>
+{% endblock content %}
