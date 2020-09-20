@@ -1,22 +1,79 @@
 {% extends 'base.html' %}
 
+
 {% block headtitle %}
  I am Mayur
 {% endblock headtitle %}
 
 {% block content %}
-Welocme to tweetme 2
+<div class="row  text-center">
+ <div class="col">
+  <h1>Welocme to SPIRIT</h1>
+  </div>
+</div>
+
+<div class="row mb-3">
+   <div class="col-md-4 mx-auto col-10">
+      <form class="form" method="POST" action='/cr_spirit/'>{% csrf_token %}
+         <input type="hidden" value="/" name="next"/>
+         <textarea class="form-control" name="content" placeholder="Share your SPIRIT"></textarea>
+         <button type="submit" class="btn btn primary">TWEET</button>
+
+      </form>
+
+   </div>
+</div>
+
+<div class="row" id ='tweet'>
+ Replace Me
+</div>
 
 <script>
+const tweetElements = document.getElementById("tweet")
+tweetElements.innerHTML = 'Loading...'
 const xhr = new XMLHttpRequest()
 const method = "GET"
-const url = "/tweets"
+const url = "/spirit"
 const responseType = "json"
+
+function handled_id_like(tweet_id, current_count){
+ console.log(tweet_id,current_count)
+}
+
+function like_button(tweet){
+button = "<button class='btn btn-primary btn-sm' type='button' onclick= handled_id_like("+ tweet.id +","+tweet.likes+")>"
++tweet.likes+"LIKE</button>"
+return button
+}
+
+function format_tweet_element(tweet){
+formatted_tweet = "<div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4' id='tweet'><p>" +tweet.id + "</p><p>"
++tweet.content +"</p><p><div class='btn btn-group'>"+like_button(tweet)+"</div></p></div>"
+return formatted_tweet
+}
+
+var el1 = "<h3>Hi there</h3>"
+var el2 = "<h3>Hi there</h3>"
+var el3 = "<h3>Hi there</h3>"
+tweetElements.innerHTML = el1 + el2 + el3
 
 xhr.responseType = responseType
 xhr.open(method, url)
 xhr.onload = function() {
- console.log(xhr.response)
+ const serverResponse = xhr.response
+ var listedItems = serverResponse.response
+ console.log(listedItems)
+ var final_tweet = ''
+ var i;
+ for(i=0; i< listedItems.length; i++)
+ {
+   console.log(i)
+   console.log(listedItems[i])
+   var tweet_obj = listedItems[i]
+   current_items = format_tweet_element(tweet_obj)
+   final_tweet += current_items
+ }
+ tweetElements.innerHTML = final_tweet
 
 }
 xhr.send()
