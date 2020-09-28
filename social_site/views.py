@@ -1,8 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
+from django.conf import  settings
+from django.utils.http import is_safe_url
 from .models import Tweet
 from .forms import SpiritForm
 import random
+ALLOWED_HOSTS = settings.ALLOWED_HOSTS
 
 # Create your views here.
 def home_view(request, *args, **kwargs):
@@ -10,9 +13,13 @@ def home_view(request, *args, **kwargs):
 
 def spirit_create_view(request, *args, **kwargs):
     form = SpiritForm(request.POST or None)
+    nex_url = request.POST.get("next") or None
+    print("next>>>>>>>>", nex_url)
     if form.is_valid():
         obj = form.save(commit=False)
         obj.save()
+        if nex_url != None and is_safe_url(nex_url,ALLOWED_HOSTS): #this will check if next_url is in the allowed hosts then only it will redirect otheriwse it will be render
+            return redirect(nex_url)
         form = SpiritForm()
     return render(request, 'pages/form.html', context={"form":form})
 

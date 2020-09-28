@@ -14,10 +14,10 @@
 
 <div class="row mb-3">
    <div class="col-md-4 mx-auto col-10">
-      <form class="form" method="POST" action='/cr_spirit/'>{% csrf_token %}
-         <input type="hidden" value="/" name="next"/>
+      <form class="form" method="POST" id="tweet-create-form" action='/cr_spirit/'>{% csrf_token %}
+         <input type="hidden" value='/' name="next"/>
          <textarea class="form-control" name="content" placeholder="Share your SPIRIT"></textarea>
-         <button type="submit" class="btn btn primary">TWEET</button>
+         <button type="submit" class="btn btn primary">SUBMIT</button>
 
       </form>
 
@@ -29,12 +29,64 @@
 </div>
 
 <script>
-const tweetElements = document.getElementById("tweet")
-tweetElements.innerHTML = 'Loading...'
-const xhr = new XMLHttpRequest()
-const method = "GET"
-const url = "/spirit"
-const responseType = "json"
+
+function handle_tweet_create_form_after_submit(event){
+    event.preventDefault()
+    const myForm = event.target
+    const myFormData = new FormData(myForm)
+    const url = myForm.getAttribute("action")
+    const method = myForm.getAttribute("method")
+    const xhr = new XMLHttpRequest()
+    console.log(method, url)
+    xhr.open(method, url)
+    xhr.onload = function(){
+        const serverResponse = xhr.response
+        console.log(serverResponse)
+        const tweetElem = document.getElementById("tweet")
+        load_tweets(tweetElem)
+
+    }
+    xhr.send(myFormData)
+}
+
+const tweet_create_form_el = document.getElementById("tweet-create-form")
+tweet_create_form_el.addEventListener("submit",handle_tweet_create_form_after_submit)
+
+const tweetElem = document.getElementById("tweet") //when page get reload everytime this id gets called
+function load_tweets(tweetElements){
+    tweetElements.innerHTML = 'Loading...'
+    const xhr = new XMLHttpRequest()
+    const method = 'GET'
+    const url = "/spirit"
+    const responseType = "json"
+    var el1 = "<h3>Hi there</h3>"
+    var el2 = "<h3>Hi there</h3>"
+    var el3 = "<h3>Hi there</h3>"
+    tweetElements.innerHTML = el1 + el2 + el3
+
+    xhr.responseType = responseType
+    xhr.open(method, url)
+    xhr.onload = function() {
+     const serverResponse = xhr.response
+     var listedItems = serverResponse.response
+     console.log(listedItems)
+     var final_tweet = ''
+     var i;
+     for(i=0; i< listedItems.length; i++)
+     {
+       console.log(i)
+       console.log(listedItems[i])
+       var tweet_obj = listedItems[i]
+       current_items = format_tweet_element(tweet_obj)
+       final_tweet += current_items
+     }
+     tweetElements.innerHTML = final_tweet
+
+    }
+    xhr.send()
+    }
+
+load_tweets(tweetElem)
 
 function handled_id_like(tweet_id, current_count){
  console.log(tweet_id,current_count)
@@ -52,30 +104,6 @@ formatted_tweet = "<div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4
 return formatted_tweet
 }
 
-var el1 = "<h3>Hi there</h3>"
-var el2 = "<h3>Hi there</h3>"
-var el3 = "<h3>Hi there</h3>"
-tweetElements.innerHTML = el1 + el2 + el3
 
-xhr.responseType = responseType
-xhr.open(method, url)
-xhr.onload = function() {
- const serverResponse = xhr.response
- var listedItems = serverResponse.response
- console.log(listedItems)
- var final_tweet = ''
- var i;
- for(i=0; i< listedItems.length; i++)
- {
-   console.log(i)
-   console.log(listedItems[i])
-   var tweet_obj = listedItems[i]
-   current_items = format_tweet_element(tweet_obj)
-   final_tweet += current_items
- }
- tweetElements.innerHTML = final_tweet
-
-}
-xhr.send()
 </script>
 {% endblock content %}
