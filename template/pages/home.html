@@ -39,9 +39,11 @@ function handle_tweet_create_form_after_submit(event){
     const xhr = new XMLHttpRequest()
     console.log(method, url)
     xhr.open(method, url)
+    xhr.setRequestHeader("HTTP_X_REQUESTED_WITH","XMLHttpRequest") //We are calling ajax call already but in Django if we want to handle ajax call
+    xhr.setRequestHeader("X-Requested-With","XMLHttpRequest")      //in python we need to use this.. check "def spirit_create_view()"
     xhr.onload = function(){
         const serverResponse = xhr.response
-        console.log(serverResponse)
+        console.log(xhr.status, serverResponse)
         const tweetElem = document.getElementById("tweet")
         load_tweets(tweetElem)
 

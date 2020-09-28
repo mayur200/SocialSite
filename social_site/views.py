@@ -12,12 +12,15 @@ def home_view(request, *args, **kwargs):
     return render(request,"pages/home.html", context={})
 
 def spirit_create_view(request, *args, **kwargs):
+    print("Request",request.is_ajax())
     form = SpiritForm(request.POST or None)
     nex_url = request.POST.get("next") or None
     print("next>>>>>>>>", nex_url)
     if form.is_valid():
         obj = form.save(commit=False)
         obj.save()
+        if request.is_ajax():
+            return JsonResponse({},status=201)
         if nex_url != None and is_safe_url(nex_url,ALLOWED_HOSTS): #this will check if next_url is in the allowed hosts then only it will redirect otheriwse it will be render
             return redirect(nex_url)
         form = SpiritForm()
