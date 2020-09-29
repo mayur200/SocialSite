@@ -20,7 +20,7 @@ def spirit_create_view(request, *args, **kwargs):
         obj = form.save(commit=False)
         obj.save()
         if request.is_ajax():
-            return JsonResponse({},status=201)
+            return JsonResponse(obj.serialize(),status=201)
         if nex_url != None and is_safe_url(nex_url,ALLOWED_HOSTS): #this will check if next_url is in the allowed hosts then only it will redirect otheriwse it will be render
             return redirect(nex_url)
         form = SpiritForm()
@@ -49,7 +49,7 @@ def tweet_list_view(request, *args, **kwargs):
     Return json data
     '''
     qs = Tweet.objects.all()
-    tweet_list = [{'id':x.id,'content':x.content, 'likes':random.randint(0, 12)}for x in qs]
+    tweet_list = [x.serialize()for x in qs]
     data = {
         "isUser": False,
         'response': tweet_list
