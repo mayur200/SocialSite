@@ -26,6 +26,7 @@ SECRET_KEY = '$nskc&cxyzs*^8c@b46l=#6itndn5t6zg_d&-m2sdo+i4ly=7%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+MAX_SPIRIT_LENGTH = 240
 
 # ALLOWED_HOSTS = ['127.0.0.1','.mayurpardeshi.com',]
 
@@ -39,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #third_party
+    'rest_framework',
+    #internal
     'social_site',
 ]
 
@@ -121,3 +125,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+DEFAULT_RENDERER_CLASSES = [
+     'rest_framework.renderers.JSONRenderer',
+]
+
+if DEBUG :
+    DEFAULT_RENDERER_CLASSES +=  [
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ]
+
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication'
+    ],
+    'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
+}
