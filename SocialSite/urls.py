@@ -21,3 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('social_site.urls', namespace='social_site')),
 ]
+# admin = admin
+# password = admin

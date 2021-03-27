@@ -27,6 +27,8 @@ SECRET_KEY = '$nskc&cxyzs*^8c@b46l=#6itndn5t6zg_d&-m2sdo+i4ly=7%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 MAX_SPIRIT_LENGTH = 240
+TWEET_ACTION_OPTIONS = ['like', 'unlike', 'retweet' ]
+
 
 # ALLOWED_HOSTS = ['127.0.0.1','.mayurpardeshi.com',]
 

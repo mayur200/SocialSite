@@ -30,7 +30,21 @@
 </div>
 
 <script>
-
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 //This function gets called when there is an 400 error in the tweet
 function handle_tweet_form_error(msg, display){
     var myErrorDiv = document.getElementById("tweet-create-form-error")
@@ -142,19 +156,56 @@ function load_tweets(tweetElements){
 
 load_tweets(tweetElem)
 
-function handled_id_like(tweet_id, current_count){
- //console.log(tweet_id,current_count)
+function handled_tweet_action(tweet_id, current_count){
+//console.log(">>>>>>>>>>",tweet_id,current_count)
+console.log(">>>>>>>>>>",tweet_id,current_count)
+const url = "api/spirit/action"
+const method = "POST"
+const data = JSON.stringify({
+    id: tweet_id,
+    action: "like"
+})
+const xhr = new XMLHttpRequest()
+const csrftoken = getCookie('csrftoken'); //https://stackoverflow.com/questions/20504846/why-is-it-common-to-put-csrf-prevention-tokens-in-cookies
+xhr.open(method, url)
+xhr.setRequestHeader("Content-type","application/json" )
+xhr.setRequestHeader("HTTP_X_REQUESTED_WITH","XMLHttpRequest") //We are calling ajax call already but in Django if we want to handle ajax call
+xhr.setRequestHeader("X-Requested-With","XMLHttpRequest")//in python we need to use this.. check "def tweet_action_view()"
+xhr.setRequestHeader("X-CSRFToken",csrftoken) //You have to pass the CSRF token with every AJAX post request
+xhr.onload = function(){
+
+    console.log(xhr.status,xhr.response)
+    //This will be handled by ReactJs with better and ease
+    load_tweets(tweetElem)
+
+}
+xhr.send(data)
+return
+}
+
+function spirit_button(tweet){
+button_unlike = "<button class='btn btn-outline-success btn-sm' type='button' onclick= handled_tweet_action("+ tweet.id +","+tweet.likes+ ",'spirit')>Spirit</button>"
+return button_unlike
+}
+
+function unlike_button(tweet){
+button_unlike = "<button class='btn btn-outline-primary btn-sm' type='button' onclick= handled_tweet_action("+ tweet.id +","+tweet.likes+ ",'UNLIKE')>UNLIKE</button>"
+return button_unlike
 }
 
 function like_button(tweet){
-button = "<button class='btn btn-primary btn-sm' type='button' onclick= handled_id_like("+ tweet.id +","+tweet.likes+")>"
+button = "<button class='btn btn-primary btn-sm' type='button' onclick= handled_tweet_action("+ tweet.id +","+tweet.likes+ ",'like')>"
 +tweet.likes+"LIKE</button>"
 return button
 }
 
 function format_tweet_element(tweet){
 formatted_tweet = "<div class='col-12 col-md-10 mx-auto border rounded py-3 mb-4' id='tweet'><p>" +tweet.id + "</p><p>"
-+tweet.content +"</p><p><div class='btn btn-group'>"+like_button(tweet)+"</div></p></div>"
++tweet.content+"</p><p><div class='btn btn-group'>"
++like_button(tweet)+
+unlike_button(tweet)+
+spirit_button(tweet)+
+"</div></p></div>"
 return formatted_tweet
 }
 
