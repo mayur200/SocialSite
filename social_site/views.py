@@ -4,7 +4,7 @@ from django.conf import  settings
 from django.utils.http import is_safe_url
 from .models import Tweet
 from .forms import SpiritForm
-from .serializers import TweetSerializer, TweetActionSerializer
+from .serializers import TweetSerializer, TweetActionSerializer, TweetCreateSerializer
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -23,7 +23,7 @@ def home_view(request, *args, **kwargs):
 @authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated])
 def spirit_create_view(request, *args, **kwargs):
-    serializer = TweetSerializer(data=request.POST)
+    serializer = TweetCreateSerializer(data=request.POST)
     if serializer.is_valid(raise_exception=True):
         serializer.save(user=request.user)
         return  Response(serializer.data, status=201)
@@ -74,7 +74,7 @@ def tweet_delete_view(request,spirit_id, *args, **kwargs):
 def tweet_action_view(request, *args, **kwargs):
     '''
        id is required
-       Action options are: like, unlike, retweet
+       Action options are: likes, unlike, retweet
     '''
     print(request.POST, request.data)
     serializer = TweetActionSerializer(data=request.data)
@@ -82,6 +82,7 @@ def tweet_action_view(request, *args, **kwargs):
         data = serializer.validated_data
         spirit_id = data.get("id")
         action = data.get("action")
+        content = data.get("content")
         qs = Tweet.objects.filter(id=spirit_id)
         if not qs.exists():
             return Response({},status=404)
@@ -89,10 +90,18 @@ def tweet_action_view(request, *args, **kwargs):
         if action == 'like':
             obj.likes.add(request.user)
             serializer = TweetSerializer(obj)
+            print("serializer",serializer)
             return Response(serializer.data, status=200)
         elif action == 'unlike':
             obj.likes.remove(request.user)
-        elif action == "retwwet":
+            serializer = TweetSerializer(obj)
+            return Response(serializer.data, status=200)
+        elif action == "re-spirit":
+            print("obj>>>>>",obj.content)
+            print("content>>>>>",content)
+            new_tweet = Tweet.objects.create(user=request.user, parent=obj, content=content)
+            serializer = TweetSerializer(new_tweet)
+            return Response(serializer.data, status=201)
             pass
     return Response({"message":"Tweet Removed"}, status=200)
 
@@ -146,6 +155,7 @@ def tweet_list_view_pure_django(request, *args, **kwargs):
     '''
     qs = Tweet.objects.all()
     tweet_list = [x.serialize()for x in qs]
+    print("tweet_list",tweet_list)
     data = {
         "isUser": False,
         'response': tweet_list

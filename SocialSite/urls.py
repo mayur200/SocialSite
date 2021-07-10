@@ -19,7 +19,7 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('social_site.urls', namespace='social_site')),
+    path('home/api/spirit/', include('social_site.urls', namespace='social_site')),
 ]
 # admin = admin
 # password = admin
